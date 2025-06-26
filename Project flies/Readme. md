@@ -1,1 +1,23 @@
-project executable flies
+import pandas as pd
+
+# Sample GPT-generated butterfly data
+data = [
+    {
+        "Butterfly Name": "Luminara Sylphae",
+        "Wing Enchantment": "Wings glow softly at twilight",
+        "Real Species Inspiration": "Morpho menelaus",
+        "Magical Ability": "Can light paths in dark forests",
+        "Region (Speculative)": "Enchanted Amazon"
+    },
+    {
+        "Butterfly Name": "Crimson Whispershade",
+        "Wing Enchantment": "Wings shimmer with shifting text",
+        "Real Species Inspiration": "Cethosia biblis",
+        "Magical Ability": "Carries forgotten messages from ancestors",
+        "Region (Speculative)": "Forbidden Himalayan Valleys"
+    },
+    # Add more entries here...
+]
+
+df = pd.DataFrame(data)
+print(df)project executable flies
