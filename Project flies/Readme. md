@@ -1,3 +1,73 @@
+Sure! Here's a basic example of how to split data and build a machine learning model using Python with scikit-learn. This example uses a classification task with the popular Iris dataset.
+
+
+---
+
+✅ Step 1: Import Libraries
+
+import pandas as pd
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+
+
+---
+
+✅ Step 2: Load Dataset
+
+# Load iris dataset
+iris = load_iris()
+X = pd.DataFrame(iris.data, columns=iris.feature_names)
+y = pd.Series(iris.target)
+
+
+---
+
+✅ Step 3: Split the Data
+
+# Split data: 70% training, 30% testing
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42
+)
+
+
+---
+
+✅ Step 4: Build and Train the Model
+
+# Initialize the model
+model = RandomForestClassifier(random_state=42)
+
+# Train the model
+model.fit(X_train, y_train)
+
+
+---
+
+✅ Step 5: Predict and Evaluate
+
+# Make predictions
+y_pred = model.predict(X_test)
+
+# Evaluate accuracy
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy:.2f}")
+
+
+---
+
+🔁 Summary
+
+train_test_split: Used to divide your dataset into training and test parts.
+
+RandomForestClassifier: Just one example model—you can swap in SVM, KNN, etc.
+
+accuracy_score: Measures how well your model performs.
+
+
+Would you like an example using regression instead of classification?
+
 import pandas as pd
 
 # Sample GPT-generated butterfly data
