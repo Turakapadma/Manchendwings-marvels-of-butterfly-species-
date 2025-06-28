@@ -1,0 +1,102 @@
+import tensorflow as tf
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.applications import ResNet50
+from tensorflow.keras.models import Model
+from tensorflow.keras.layer import GlobalAveragePooling2D, Dense, Dropout
+from tensorflow.keras.optimizers import Adam
+import numpy as np
+
+IMG_SIZE = (224, 224)
+BATCH = 32
+DATA_DIR = "data/"  # expects data/train, data/val, data/test subfolders
+
+# Augmentation for training, only rescale for val/test
+train_gen = ImageDataGenerator(rescale=1./255,
+                               rotation_range=40,
+                               width_shift_range=0.2,
+                               height_shift_range=0.2,
+                               zoom_range=0.2,
+                               horizontal_flip=True)
+val_gen = ImageDataGenerator(rescale=1./255)
+
+train_flow = train_gen.flow_from_directory(DATA_DIR + 'train',
+                                           target_size=IMG_SIZE,
+                                           batch_size=BATCH,
+                                           class_mode='categorical')
+val_flow = val_gen.flow_from_directory(DATA_DIR + 'val',
+                                       target_size=IMG_SIZE,
+                                       batch_size=BATCH,
+                                       class_mode='categorical')
+test_flow = val_gen.flow_from_directory(DATA_DIR + 'test',
+                                        target_size=IMG_SIZE,
+                                        batch_size=BATCH,
+                                        class_mode='categorical')
+num_classes = train_flow.num_classes
+base = ResNet50(weights='imagenet', include_top=False,
+                input_shape=(*IMG_SIZE, 3))
+
+x = base.output
+x = GlobalAveragePooling2D()(x)
+x = Dense(256, activation='relu')(x)
+x = Dropout(0.4)(x)
+predictions = Dense(num_classes, activation='softmax')(x)
+
+model = Model(inputs=base.input, outputs=predictions)
+for layer in base.layers:
+    layer.trainable = False
+
+model.compile(optimizer=Adam(1e-4),
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
+
+history = model.fit(train_flow,
+                    validation_data=val_flow,
+                    epochs=15)
+model.save('butterfly_resnet50.keras')
+from tensorflow.keras.models import load_model
+model = load_model('butterfly_resnet50.keras')
+from tensorflow.keras.preprocessing import image
+import os
+
+def predict_image(path):
+    img = image.load_img(path, target_size=IMG_SIZE)
+    arr = image.img_to_array(img) / 255.0
+    arr = np.expand_dims(arr, 0)
+    preds = model.predict(arr)[0]
+    top3 = preds.argsort()[-3:][::-1]
+    inv = {v:k for k,v in train_flow.class_indices.items()}
+    return [(inv[i], float(preds[i])) for i in top3]
+
+print(predict_image('new_butterfly.jpg'))
+from tensorflow.keras.preprocessing import image
+import os
+
+def predict_image(path):
+    img = image.load_img(path, target_size=IMG_SIZE)
+    arr = image.img_to_array(img) / 255.0
+    arr = np.expand_dims(arr, 0)
+    preds = model.predict(arr)[0]
+    top3 = preds.argsort()[-3:][::-1]
+    inv = {v:k for k,v in train_flow.class_indices.items()}
+    return [(inv[i], float(preds[i])) for i in top3]
+
+print(predict_image('new_butterfly.jpg'))
+from tensorflow.keras.preprocessing import image
+import os
+
+def predict_image(path):
+    img = image.load_img(path, target_size=IMG_SIZE)
+    arr = image.img_to_array(img) / 255.0
+    arr = np.expand_dims(arr, 0)
+    preds = model.predict(arr)[0]
+    top3 = preds.argsort()[-3:][::-1]
+    inv = {v:k for k,v in train_flow.class_indices.items()}
+    return [(inv[i], float(preds[i])) for i in top3]
+
+print(predict_image('new_butterfly.jpg'))
+for layer in base.layers[-10:]:
+    layer.trainable = True
+model.compile(optimizer=Adam(1e-5),
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
+model.fit(train_flow, validation_data=val_flow, epochs=5)
