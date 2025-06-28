@@ -1,0 +1,36 @@
+import pandas as pd
+from torchvision.datasets import ImageFolder
+from torchvision import transforms
+
+# 1. Load image dataset
+dataset = ImageFolder('leeds_butterfly_dataset/images',
+                      transform=transforms.Compose([
+                          transforms.Resize((224,224)),
+                          transforms.ToTensor()]))
+
+# 2. Load global traits
+traits = pd.read_csv('LepTraits_v1.csv')
+
+# 3. Create mapping {species_label: trait_data}
+df_img = pd.DataFrame(dataset.imgs, columns=['path','label'])
+df_img['species'] = df_img['label'].map(lambda idx: dataset.classes[idx])
+
+# 4. Merge traits
+merged = df_img.merge(traits, left_on='species', right_on='species_name', how='left')
+
+print(merged[['path','species','wingspan','hostplant']].head())
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+df = pd.read_csv('butterfly_traits.csv')  # or your merged dataset
+
+sns.histplot(data=df, x='wingspan', kde=True)
+plt.title('Wingspan Distribution')
+plt.show()
+
+sns.boxplot(data=df, x='species', y='wingspan')
+plt.xticks(rotation=45)
+plt.title('Wingspan by Species')
+plt.show()
+sns.color_palette('bright')
