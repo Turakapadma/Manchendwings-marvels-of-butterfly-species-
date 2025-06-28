@@ -1,0 +1,22 @@
+import pandas as pd
+
+df = pd.read_csv('butterfly-dataset-south-india/yourfile.csv')
+print(df.head())
+
+
+traits = pd.read_csv('europe_butterfly_traits.csv')
+print(traits.columns)
+
+
+import os
+from torchvision.datasets import ImageFolder
+from torchvision import transforms
+
+transform = transforms.Compose([transforms.Resize((224,224)), transforms.ToTensor()])
+dataset = ImageFolder('leeds_butterfly_dataset/images', transform=transform)
+print(len(dataset), dataset.classes)
+
+
+traits_global = pd.read_csv('LepTraits_v1.csv')
+species = traits_global['species'].unique()
+print(len(species), 'species loaded')
