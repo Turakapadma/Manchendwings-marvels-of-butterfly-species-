@@ -1,0 +1,49 @@
+model.save('butterfly_classifier.keras')
+model.save('saved_model/butterfly')
+model.save('butterfly_model.h5')
+
+model.save('butterfly_model.h5')
+
+from tensorflow.keras.models import load_model
+
+# For .keras or SavedModel
+model = load_model('butterfly_classifier.keras')
+# or model = load_model('saved_model/butterfly')
+# or model = load_model('butterfly_model.h5')
+
+model.summary()
+loss, acc = model.evaluate(test_flow)
+print(f"Restored model accuracy: {acc*100:.2f}%")
+# Save weights only
+model.save_weights('butterfly_weights.h5')
+
+# Define same model architecture
+model = create_model(...)
+model.load_weights('butterfly_weights.h5')
+# Train your model
+model.fit(train_flow, validation_data=val_flow, epochs=15)
+
+# Save full model
+model.save('butterfly_classifier.keras')
+
+# Later... load it
+from tensorflow.keras.models import load_model
+model = load_model('butterfly_classifier.keras')
+
+# Evaluate
+test_loss, test_acc = model.evaluate(test_flow)
+print(f"Accuracy after loading: {test_acc:.2%}")
+
+# Predict new image
+from tensorflow.keras.preprocessing import image
+import numpy as np
+
+img = image.load_img('new_butterfly.jpg', target_size=(224,224))
+x = image.img_to_array(img) / 255.0
+x = np.expand_dims(x, axis=0)
+
+preds = model.predict(x)[0]
+top3 = preds.argsort()[-3:][::-1]
+inv_map = {v: k for k,v in train_flow.class_indices.items()}
+for idx in top3:
+    print(inv_map[idx], preds[idx])
