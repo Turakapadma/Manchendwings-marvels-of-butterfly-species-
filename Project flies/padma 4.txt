@@ -1,0 +1,30 @@
+import requests, zipfile, io
+
+url = 'https://zenodo.org/record/4099136/files/butterfly-dataset-south-india-1.0.1.zip'
+r = requests.get(url)
+z = zipfile.ZipFile(io.BytesIO(r.content))
+z.extractall('south_india')
+  
+
+
+import pandas as pd
+from torchvision.datasets import ImageFolder
+from torchvision import transforms
+
+# 1. Load image dataset
+dataset = ImageFolder('leeds_butterfly_dataset/images',
+                      transform=transforms.Compose([
+                          transforms.Resize((224,224)),
+                          transforms.ToTensor()]))
+
+# 2. Load global traits
+traits = pd.read_csv('LepTraits_v1.csv')
+
+# 3. Create mapping {species_label: trait_data}
+df_img = pd.DataFrame(dataset.imgs, columns=['path','label'])
+df_img['species'] = df_img['label'].map(lambda idx: dataset.classes[idx])
+
+# 4. Merge traits
+merged = df_img.merge(traits, left_on='species', right_on='species_name', how='left')
+
+print(merged[['path','species','wingspan','hostplant']].head())
