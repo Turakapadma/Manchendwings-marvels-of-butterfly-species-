@@ -1,0 +1,37 @@
+/butterfly_project
+│
+├── data/
+│   └── butterfly_species.csv
+│
+├── images/
+│   └── morpho_didius.jpg
+│
+├── scripts/
+│   └── collect_species.py
+│   └── fetch_images.py
+│   └── enrich_traits.py
+
+
+import requests
+import pandas as pd
+
+def get_butterfly_species(limit=200):
+    url = "https://api.gbif.org/v1/species/search"
+    params = {"q": "butterfly", "rank": "species", "limit": limit}
+    r = requests.get(url, params=params)
+    data = r.json()["results"]
+
+    species_data = []
+    for s in data:
+        species_data.append({
+            "name": s.get("scientificName"),
+            "family": s.get("family"),
+            "genus": s.get("genus"),
+            "rank": s.get("rank")
+        })
+
+    df = pd.DataFrame(species_data)
+    df.to_csv("data/butterfly_species.csv", index=False)
+    return df
+
+get_butterfly_species()
